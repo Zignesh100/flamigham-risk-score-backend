@@ -42,7 +42,7 @@ const MRuserschema = new Schema({
   },
 
   DOJ: {
-    type: Number,
+    type: String,
   },
   status: {
     type: Number,

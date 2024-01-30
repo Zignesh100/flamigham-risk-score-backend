@@ -2,15 +2,19 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const patientestSchema = new Schema({
   TestName: String,
-  Gender: String,
-  Age: Number,
-  TotalCholesterol: Number,
-  Underhypertensiontreatment: Boolean,
-  Systolicbloodpressure: Number,
-  Smoking: Boolean,
-  Riskscore: String,
-  dot: Date,
+  gender: Boolean,                 
+  age: String,                   
+  totalCholesterol: String,       
+  hdlCholesterol: String,         
+  sbpTreated: Boolean,            
+  blood_pressure: String,         
+  smoking: Boolean, 
+  result:String,
+  dot: {
+    type: Date,
+    default: Date.now(),
+  },
+  
 
- 
 });
 export default mongoose.model("test", patientestSchema);

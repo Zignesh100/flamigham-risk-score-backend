@@ -21,6 +21,8 @@ export const Patienadd = async (req, res) => {
 
     const savedPatient = await newPatient.save();
 
+    const patientid = savedPatient._id
+
     if (!druser.PTID) {
       druser.PTID = [];
     }
@@ -29,9 +31,10 @@ export const Patienadd = async (req, res) => {
     druser.PTID.push(savedPatient._id);
     await druser.save();
 
+
     const populatedDRUser = await Doctormodel.findById(docid).populate("PTID");
 
-    res.status(201).json(populatedDRUser);
+    res.status(201).json({message: "patient added successfully", data: populatedDRUser , patientid});
     console.log(populatedDRUser)
   } catch (error) {
     console.error(error);

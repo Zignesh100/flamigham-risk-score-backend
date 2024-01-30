@@ -128,28 +128,7 @@ export  const getadmin  = async (req,res)=>{
 
 
 
-// export const getData = async (req, res) => {
-//   const models = {
-//     doctor: DoctorModel,
-//     admin: AdminModel,
-//     mruser: MRUserModel,
-//     patient: PatienSchema, 
-//   };
 
-//   const modelName = req.params.model.toLowerCase();
-
-//   try {
-//     if (models[modelName]) {
-//       const data = await models[modelName].find();
-//       res.json(data);
-//     } else {
-//       res.status(404).json({ message: 'Model not found' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Server Error' });
-//   }
-// };
 
 
 export const getData = async (req, res) => {
@@ -162,7 +141,7 @@ export const getData = async (req, res) => {
       doctor: DoctorModel,
       admin: AdminModel,
       mruser: MRUserModel,
-      patient: PatienSchema, // Assuming it's a typo and should be PatientSchema
+      patient: PatienSchema,
     };
 
     const modelName = req.params.model.toLowerCase();
@@ -177,4 +156,136 @@ export const getData = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
+};
+
+
+
+
+
+
+
+
+// export const handleDetailedReport = async (req, res) => {
+//   try {
+//     const mrData = await MRUserModel.find({ role: "MR" })
+//       .populate({
+//         path: 'doctorID',
+//         model: 'doctor',
+//         populate: {
+//           path: 'PTID',
+//           model: 'patient',
+//           populate: {
+//             path: 'testdata',
+//             model: 'test',
+//           },
+//         },
+//       })
+//       .exec();
+
+//     // Reshape the data into the desired format
+//     const detailedReport = mrData.flatMap((mr) => {
+//       const doctorsData = mr.doctorID.flatMap((doctor) => {
+//         const patientsData = doctor.PTID.flatMap((patient) => {
+//           const testsData = patient.testdata.map((test) => {
+//             return {
+//               Mrname: mr.MRname,
+//               MrCode: mr.MRCODE,
+//               Div: mr.DIV,
+//               Hq: mr.HQ,
+//               state: mr.state,
+//               DESG: mr.DESG,
+//               email: mr.email,
+//               DOJ: mr.DOJ,
+//               doctorName: doctor.name,
+//               // Add patient and test details here if needed
+//               patientName: patient.name,
+//               patientPhoneNumber: patient.phoneNumber,
+//               testName: test.TestName,
+//             };
+//           });
+
+//           return testsData;
+//         });
+
+//         return patientsData;
+//       });
+
+//       return doctorsData;
+//     });
+
+//     res.status(200).json(detailedReport);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, error: "Internal Server Error" });
+//   }
+// };
+
+
+
+export const handleDetailedReport = async (req, res) => {
+  try {
+    const mrData = await MRUserModel.find({ role: "MR" })
+      .populate({
+        path: 'doctorID',
+        model: 'doctor',
+        populate: {
+          path: 'PTID',
+          model: 'patient',
+          populate: {
+            path: 'testdata',
+            model: 'test',
+          },
+        },
+      })
+      .exec();
+
+   
+    const detailedReport = mrData.flatMap((mr) => {
+      const doctorsData = mr.doctorID.flatMap((doctor) => {
+        const patientsData = doctor.PTID.flatMap((patient) => {
+          const testsData = patient.testdata.map((test) => {
+            return {
+              Mrname: mr.MRname,
+              MrCode: mr.MRCODE,
+              Div: mr.DIV,
+              Hq: mr.HQ,
+              state: mr.state,
+              DESG: mr.DESG,
+              email: mr.email,
+              DOJ: mr.DOJ,
+              doctorName: doctor.name,
+              scCode: doctor.scCode,
+              doctorstate: doctor.state,
+              city: doctor.city,
+              location: doctor.location,
+              phoneNumberdoctor: doctor.phoneNumber,
+              specialty:doctor.specialty,
+              patientName: patient.name,
+              patientemail: patient.email,
+              patientPhoneNumber: patient.phoneNumber,
+              testName: test.TestName,
+              Gender: test.Gender,
+              Age: test.Age,
+              TotalCholesterol: test.TotalCholesterol,
+              Underhypertensiontreatment: test.Underhypertensiontreatment,
+              Systolicbloodpressure: test.Systolicbloodpressure,
+              Smoking: test.Smoking,
+              Riskscore: test.Riskscore,
+            };
+          });
+
+          return testsData;
+        });
+
+        return patientsData;
+      });
+
+      return doctorsData;
+    });
+
+    res.status(200).json(detailedReport);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
 };

@@ -124,3 +124,23 @@ export const MrsignIn = async (req, res) => {
 
 
 
+
+
+
+export const getMRUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const MRuserData = await MRUserModel.findOne({ _id: id });
+    if (MRuserData) {
+      return res.status(200).json({
+        data: MRuserData,
+        message: "Successfully Data fatched",
+        
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};

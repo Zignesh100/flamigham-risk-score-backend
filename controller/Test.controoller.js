@@ -1,21 +1,19 @@
 import patientestSchema from "../model/Test.modal";
 import Patienschema from "../model/Patient.modal";
 export const patientestsubmit = async (req, res) => {
- 
-
   try {
     const {
       TestName,
-      Gender,
-      Age,
-      TotalCholesterol,
-      Underhypertensiontreatment,
-      Systolicbloodpressure,
-      Smoking,
-      Riskscore,
+      gender,
+      age,
+      totalCholesterol,
+      hdlCholesterol,
+      sbpTreated,
+      blood_pressure,
+      smoking,
+      result,
       dot,
     } = req.body;
-    
 
     const ptid = req.params.ptid;
     const PTuser = await Patienschema.findById({ _id: ptid });
@@ -27,32 +25,38 @@ export const patientestsubmit = async (req, res) => {
     const patientTestData = new patientestSchema({
       ptID: PTuser._id,
       TestName,
-      Gender,
-      Age,
-      TotalCholesterol,
-      Underhypertensiontreatment,
-      Systolicbloodpressure,
-      Smoking,
-      Riskscore,
+      gender,
+      age,
+      totalCholesterol,
+      hdlCholesterol,
+      sbpTreated,
+      blood_pressure,
+      smoking,
+      result,
       dot,
     });
 
     const savedTestData = await patientTestData.save();
 
+    const testid = savedTestData._id;
+
     if (!PTuser.testdata) {
       PTuser.testdata = [];
     }
 
-
     PTuser.testdata.push(savedTestData._id);
     await PTuser.save();
 
-    const populatedPTUser = await Patienschema.findById(ptid).populate("testdata");
-    res.status(201).json(populatedPTUser);
-    // res.status(201).json({
-    //   message: "Patient test data submitted successfully",
-    //   data: populatedPTUser,
-    // });
+    const populatedPTUser = await Patienschema.findById(ptid).populate(
+      "testdata"
+    );
+    res
+      .status(201)
+      .json({
+        message: "Patient test data submitted successfully",
+        data: populatedPTUser,
+        testid,
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({
